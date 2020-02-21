@@ -5,6 +5,7 @@ v0.0.1
 HTML, CSS, JS, express.js, GIT
 ## Работа с сервером
 `npm run start` запуск сервера на localhost:3000  
+<<<<<<< HEAD
 
 `npm run dev` запуск сервера на localhost:3000 с хот релоудом  
 ## Запросы к API
