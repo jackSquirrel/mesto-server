@@ -12,9 +12,11 @@ router.get('/', (req, res) => {
 router.get('/:_id', (req, res) => {
   fs.readFile(fileName, { encoding: 'utf8' }, (err, data) => {
     if (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
       return;
     }
+    // eslint-disable-next-line arrow-body-style
     const user = JSON.parse(data).find((el) => {
       // eslint-disable-next-line no-underscore-dangle
       return el._id === req.params._id;
