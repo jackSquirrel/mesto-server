@@ -23,7 +23,11 @@ const createUser = (req, res) => {
 const refreshProfile = (req, res) => {
   const { name, about } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { name, about })
+  User.findByIdAndUpdate(req.user._id, { name, about }, {
+    new: true,
+    runValidators: true,
+    upsert: false
+  })
     .then(user => res.send(user))
     .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }))
 };
@@ -31,7 +35,11 @@ const refreshProfile = (req, res) => {
 const refreshAvatar = (req, res) => {
   const avatar = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { avatar })
+  User.findByIdAndUpdate(req.user._id, { avatar }, {
+    new: true,
+    runValidators: true,
+    upsert: false
+  })
     .then((user) => res.send(user))
     .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
 }
