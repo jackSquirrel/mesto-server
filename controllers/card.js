@@ -21,8 +21,22 @@ const deleteCard = (req, res) => {
     .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
 };
 
+const setLike = (req, res) => {
+  Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+    .then(card => res.send(card))
+    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
+};
+
+const removeLike = (req, res) => {
+  Card.findByIdAndUpdate(req.user._id, { $pull: { likes: req.user._id } }, { new: true })
+    .then(card => res.send(card))
+    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
+}
+
 module.exports = {
   getCards,
   createCard,
-  deleteCard
+  deleteCard,
+  setLike,
+  removeLike
 };
