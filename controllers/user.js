@@ -15,7 +15,7 @@ const getUser = (req, res) => {
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
-  User.create({ name, about, avatar })
+  User.create({ name, about, avatar }, { runValidators: true })
     .then(user => res.send(user))
     .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
 };
