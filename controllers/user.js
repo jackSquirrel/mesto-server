@@ -9,7 +9,7 @@ const getUsers = (req, res) => {
 const getUser = (req, res) => {
   User.findById(req.params.userId)
     .then(user => res.send(user))
-    .catch(() => res.status(404).send({ message: 'Нет пользователя с таким id' }))
+    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }))
 };
 
 const createUser = (req, res) => {
@@ -17,7 +17,7 @@ const createUser = (req, res) => {
 
   User.create({ name, about, avatar }, { runValidators: true })
     .then(user => res.send(user))
-    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
+    .catch((err) => res.status(400).send({ message: err.message }));
 };
 
 const refreshProfile = (req, res) => {
@@ -28,7 +28,7 @@ const refreshProfile = (req, res) => {
     runValidators: true
   })
     .then(user => res.send(user))
-    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }))
+    .catch((err) => res.status(err.status).send({ message: err.message }))
 };
 
 const refreshAvatar = (req, res) => {
@@ -39,7 +39,7 @@ const refreshAvatar = (req, res) => {
     runValidators: true
   })
     .then((user) => res.send(user))
-    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
+    .catch((err) => res.status(err.status).send({ message: err.message }));
 }
 
 module.exports = {
