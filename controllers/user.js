@@ -3,7 +3,7 @@ const User = require('../models/user');
 const getUsers = (req, res) => {
   User.find({})
     .then(users => res.send(users))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
 };
 
 const getUser = (req, res) => {
@@ -28,18 +28,18 @@ const refreshProfile = (req, res) => {
     runValidators: true
   })
     .then(user => res.send(user))
-    .catch((err) => res.status(err.status).send({ message: err.message }))
+    .catch((err) => res.status(400).send({ message: err.message }))
 };
 
 const refreshAvatar = (req, res) => {
-  const avatar = req.body;
+  const { avatar } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { avatar }, {
     new: true,
     runValidators: true
   })
     .then((user) => res.send(user))
-    .catch((err) => res.status(err.status).send({ message: err.message }));
+    .catch((err) => res.status(400).send({ message: err.message }))
 }
 
 module.exports = {

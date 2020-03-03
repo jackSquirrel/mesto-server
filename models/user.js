@@ -23,6 +23,7 @@ const userSchema = new mongoose.Schema({
       message: props => `${props.value} неверный формат ссылки`
     }
   }
-});
+},
+{ versionKey: false });
 
 module.exports = mongoose.model('user', userSchema);

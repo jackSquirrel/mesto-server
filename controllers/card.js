@@ -12,7 +12,7 @@ const createCard = (req, res) => {
 
   Card.create({ name, link, owner, likes, createdAt }, { runValidators: true })
     .then(card => res.send(card))
-    .catch((err) => res.status(err.status).send({ message: err.message }));
+    .catch((err) => res.status(400).send({ message: err.message }));
 };
 
 const deleteCard = (req, res) => {
