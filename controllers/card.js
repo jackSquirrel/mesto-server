@@ -9,10 +9,10 @@ const getCards = (req, res) => {
 };
 
 const createCard = (req, res) => {
-  const { name, link, likes, createdAt } = req.body;
+  const { name, link, createdAt } = req.body;
   const owner = req.user._id;
 
-  Card.create({ name, link, owner, likes, createdAt })
+  Card.create({ name, link, owner, createdAt })
     .then(card => res.send(card))
     .catch((err) => res.status(400).send({ message: err.message }));
 };
