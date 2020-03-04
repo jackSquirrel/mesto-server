@@ -1,9 +1,11 @@
 const Card = require('../models/card');
 
+const errorMessage = "Что-то пошло не так";
+
 const getCards = (req, res) => {
   Card.find({})
     .then(cards => res.send(cards))
-    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
+    .catch(() => res.status(500).send({ message: errorMessage }));
 };
 
 const createCard = (req, res) => {
@@ -18,19 +20,19 @@ const createCard = (req, res) => {
 const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then(card => res.send(card))
-    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
+    .catch(() => res.status(500).send({ message: errorMessage }));
 };
 
 const setLike = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .then(card => res.send(card))
-    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
+    .catch(() => res.status(500).send({ message: errorMessage }));
 };
 
 const removeLike = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then(card => res.send(card))
-    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
+    .catch(() => res.status(500).send({ message: errorMessage }));
 }
 
 module.exports = {

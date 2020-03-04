@@ -1,15 +1,17 @@
 const User = require('../models/user');
 
+const errorMessage = "Что-то пошло не так";
+
 const getUsers = (req, res) => {
   User.find({})
     .then(users => res.send(users))
-    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }));
+    .catch(() => res.status(500).send({ message: errorMessage }));
 };
 
 const getUser = (req, res) => {
   User.findById(req.params.userId)
     .then(user => res.send(user))
-    .catch(() => res.status(500).send({ message: 'Что-то пошло не так' }))
+    .catch(() => res.status(500).send({ message: errorMessage }))
 };
 
 const createUser = (req, res) => {
