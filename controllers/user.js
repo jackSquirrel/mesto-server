@@ -23,9 +23,9 @@ const createUser = (req, res) => {
 };
 
 const refreshProfile = (req, res) => {
-  const { name, about } = req.body;
+  const info = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { name, about }, {
+  User.findByIdAndUpdate(req.user._id, info, {
     new: true,
     runValidators: true
   })
