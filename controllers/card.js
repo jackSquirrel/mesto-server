@@ -10,7 +10,7 @@ const createCard = (req, res) => {
   const { name, link, likes, createdAt } = req.body;
   const owner = req.user._id;
 
-  Card.create({ name, link, owner, likes, createdAt }, { runValidators: true })
+  Card.create({ name, link, owner, likes, createdAt })
     .then(card => res.send(card))
     .catch((err) => res.status(400).send({ message: err.message }));
 };
