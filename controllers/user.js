@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const errorMessage = "Что-то пошло не так";
 
@@ -18,11 +19,13 @@ const getUser = (req, res) => {
 const createUser = (req, res) => {
   const { name, about, avatar, email, password } = req.body;
 
-
-
-  User.create({ name, about, avatar, email, password })
-    .then(user => res.send(user))
-    .catch((err) => res.status(400).send({ message: err.message || errorMessage }));
+  bcrypt.hash(password, 10)
+    .then(hash => {
+      User.create({ name, about, avatar, email, password: hash })
+        .then(user => res.send(user))
+        .catch(err => res.status(400).send({ message: err.message || errorMessage }))
+    })
+    .catch(err => res.status(500).send({ message: err.message || errorMessage }))
 };
 
 const refreshProfile = (req, res) => {
@@ -49,7 +52,22 @@ const refreshAvatar = (req, res) => {
   })
     .then((user) => res.send(user))
     .catch((err) => res.status(400).send({ message: err.message || errorMessage }))
-}
+};
+
+const login = (req, res) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password)
+    .then(user => {
+      const token = jwt.sign(
+        { _id: user._id },
+        'some-secret-key',
+        { expiresIn: '7d' }
+      );
+      res.send({ token })
+    })
+    .catch(err => res.status(401).send({ message: err.message || errorMessage }))
+};
 
 module.exports = {
   getUsers,
