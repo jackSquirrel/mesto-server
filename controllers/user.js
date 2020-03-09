@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const bcrypt = require('bcryptjs');
 
 const errorMessage = "Что-то пошло не так";
 
@@ -15,9 +16,11 @@ const getUser = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+  const { name, about, avatar, email, password } = req.body;
 
-  User.create({ name, about, avatar })
+
+
+  User.create({ name, about, avatar, email, password })
     .then(user => res.send(user))
     .catch((err) => res.status(400).send({ message: err.message || errorMessage }));
 };
