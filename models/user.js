@@ -22,6 +22,21 @@ const userSchema = new mongoose.Schema({
       },
       message: props => `${props.value} неверный формат ссылки`
     }
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    validate: {
+      validator: (email) => {
+        return /[-\.\w]+@[-\w]+\.[a-z]+/.test(email);
+      },
+      message: props => `${props.value} неверный формат email`
+    }
+  },
+  password: {
+    type: String,
+    required: true
   }
 },
 { versionKey: false });
