@@ -1,6 +1,6 @@
 # Сервер для проекта MESTO на express.js
 ## Версия проекта
-v0.1.1
+v0.2.0 
 ## Технологии, использованные в проекте
 HTML, CSS, JS, express.js, GIT
 ## Работа с сервером
@@ -14,8 +14,6 @@ HTML, CSS, JS, express.js, GIT
  
 `GET /users/:userId` возвращает конкретного пользователя
 
-`POST /users` создает нового пользователя
-
 `PATCH /users/me` обновляет информацию профиля
 
 `PATCH /users/me/avatar` обновляет аватар профиля
@@ -27,3 +25,7 @@ HTML, CSS, JS, express.js, GIT
 `PUT /cards/:cardId/likes` ставит карточке лайк
 
 `DELETE /cards/:cardId/likes` убирает лайк у карточки
+
+`POST /signup` регистрация нового пользователя
+
+`POST /signin` авторизация пользователя

@@ -81,7 +81,7 @@ const login = (req, res) => {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true
         })
-        .end();
+        .send({ token });
     })
     .catch(err => res.status(401).send({ message: err.message || errorMessage }))
 };
