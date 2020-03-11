@@ -4,17 +4,23 @@ const jwt = require('jsonwebtoken');
 
 const errorMessage = "Что-то пошло не так";
 
+// Получить список всех пользователей
+
 const getUsers = (req, res) => {
   User.find({})
     .then(users => res.send(users))
     .catch(() => res.status(500).send({ message: err.message || errorMessage }));
 };
 
+// Получить отдельного пользователя
+
 const getUser = (req, res) => {
   User.findById(req.params.userId)
     .then(user => res.send(user))
     .catch(() => res.status(500).send({ message: err.message || errorMessage }))
 };
+
+// Создать пользователя
 
 const createUser = (req, res) => {
   const { name, about, avatar, email, password } = req.body;
@@ -28,6 +34,8 @@ const createUser = (req, res) => {
     .catch(err => res.status(500).send({ message: err.message || errorMessage }))
 };
 
+// Обновить информацию профиля
+
 const refreshProfile = (req, res) => {
   if (req.body.avatar){
     res.status(400).send({ message: errorMessage });
@@ -40,8 +48,10 @@ const refreshProfile = (req, res) => {
     runValidators: true
   })
     .then(user => res.send(user))
-    .catch((err) => res.status(400).send({ message: err.message || errorMessage }))
+    .catch((err) => res.status(400).send({ message: err.message || errorMessage }));
 };
+
+// Обновить аватар
 
 const refreshAvatar = (req, res) => {
   const { avatar } = req.body;
@@ -53,6 +63,8 @@ const refreshAvatar = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => res.status(400).send({ message: err.message || errorMessage }))
 };
+
+// Авторизироваться
 
 const login = (req, res) => {
   const { email, password } = req.body;
