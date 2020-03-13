@@ -11,7 +11,8 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (link) => /https?:\/\/(www\.)?(?:[-\w.]+\.[a-z]+)(?:\/[-\w@/]*#?)?.(?:jpg|jpeg|png)/.test(link),
+      // eslint-disable-next-line no-useless-escape
+      validator: (link) => /https?:\/\/(www\.)?(?:[-\w.]+\.[a-z]+)(?:\/[-\w@\/]*#?)?(?:.(?:jpg|jpeg|png))?/.test(link),
       message: (props) => `${props.value} неверный формат ссылки`
     }
   },
