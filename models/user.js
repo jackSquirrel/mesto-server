@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
@@ -18,10 +18,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (link) => {
-        return /https?:\/\/(www\.)?(?:[-\w\.]+\.[a-z]+)(?:\/[-\w\@\/]*#?)?.(?:jpg|jpeg|png)/.test(link);
-      },
-      message: props => `${props.value} неверный формат ссылки`
+      validator: (link) => /https?:\/\/(www\.)?(?:[-\w.]+\.[a-z]+)(?:\/[-\w@/]*#?)?.(?:jpg|jpeg|png)/.test(link),
+      message: (props) => `${props.value} неверный формат ссылки`
     }
   },
   email: {
@@ -29,10 +27,8 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     validate: {
-      validator: (email) => {
-        return /[-\.\w]+@[-\w]+\.[a-z]+/.test(email);
-      },
-      message: props => `${props.value} неверный формат email`
+      validator: (email) => /[-.\w]+@[-\w]+\.[a-z]+/.test(email),
+      message: (props) => `${props.value} неверный формат email`
     }
   },
   password: {
@@ -43,16 +39,17 @@ const userSchema = new mongoose.Schema({
 },
 { versionKey: false });
 
-userSchema.statics.findUserByCredentials = function(email, password) {
+// eslint-disable-next-line func-names
+userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password')
-    .then(user => {
-      if(!user){
-        return Promise.reject(new Error('Неправильная почта или пароль'))
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error('Неправильная почта или пароль'));
       }
       return bcrypt.compare(password, user.password)
-        .then(matched => {
-          if(!matched){
-            return Promise.reject(new Error('Неправильная почта или пароль'))
+        .then((matched) => {
+          if (!matched) {
+            return Promise.reject(new Error('Неправильная почта или пароль'));
           }
           return user;
         });

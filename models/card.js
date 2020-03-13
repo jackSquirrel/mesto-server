@@ -11,10 +11,8 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (link) => {
-        return /https?:\/\/(www\.)?(?:[-\w\.]+\.[a-z]+)(?:\/[-\w\@\/]*#?)?.(?:jpg|jpeg|png)/.test(link);
-      },
-      message: props => `${props.value} неверный формат ссылки`
+      validator: (link) => /https?:\/\/(www\.)?(?:[-\w.]+\.[a-z]+)(?:\/[-\w@/]*#?)?.(?:jpg|jpeg|png)/.test(link),
+      message: (props) => `${props.value} неверный формат ссылки`
     }
   },
   owner: {
@@ -31,7 +29,6 @@ const cardSchema = new mongoose.Schema({
     default: Date.now
   }
 },
-{ versionKey: false },
-);
+{ versionKey: false });
 
 module.exports = mongoose.model('card', cardSchema);

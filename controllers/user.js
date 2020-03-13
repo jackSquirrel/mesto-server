@@ -1,23 +1,23 @@
-const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
-const errorMessage = "Что-то пошло не так";
+const errorMessage = 'Что-то пошло не так';
 
 // Получить список всех пользователей
 
 const getUsers = (req, res) => {
   User.find({})
-    .then(users => res.send(users))
-    .catch(() => res.status(500).send({ message: err.message || errorMessage }));
+    .then((users) => res.send(users))
+    .catch((err) => res.status(500).send({ message: err.message || errorMessage }));
 };
 
 // Получить отдельного пользователя
 
 const getUser = (req, res) => {
   User.findById(req.params.userId)
-    .then(user => res.send(user))
-    .catch(() => res.status(500).send({ message: err.message || errorMessage }))
+    .then((user) => res.send(user))
+    .catch((err) => res.status(500).send({ message: err.message || errorMessage }));
 };
 
 // Создать пользователя
@@ -26,18 +26,18 @@ const createUser = (req, res) => {
   const { name, about, avatar, email, password } = req.body;
 
   bcrypt.hash(password, 10)
-    .then(hash => {
+    .then((hash) => {
       User.create({ name, about, avatar, email, password: hash })
-        .then(user => res.send(user))
-        .catch(err => res.status(400).send({ message: err.message || errorMessage }))
+        .then((user) => res.send(user))
+        .catch((err) => res.status(400).send({ message: err.message || errorMessage }));
     })
-    .catch(err => res.status(500).send({ message: err.message || errorMessage }))
+    .catch((err) => res.status(500).send({ message: err.message || errorMessage }));
 };
 
 // Обновить информацию профиля
 
 const refreshProfile = (req, res) => {
-  if (req.body.avatar){
+  if (req.body.avatar) {
     res.status(400).send({ message: errorMessage });
   }
 
@@ -47,7 +47,7 @@ const refreshProfile = (req, res) => {
     new: true,
     runValidators: true
   })
-    .then(user => res.send(user))
+    .then((user) => res.send(user))
     .catch((err) => res.status(400).send({ message: err.message || errorMessage }));
 };
 
@@ -61,7 +61,7 @@ const refreshAvatar = (req, res) => {
     runValidators: true
   })
     .then((user) => res.send(user))
-    .catch((err) => res.status(400).send({ message: err.message || errorMessage }))
+    .catch((err) => res.status(400).send({ message: err.message || errorMessage }));
 };
 
 // Авторизироваться
@@ -70,7 +70,7 @@ const login = (req, res) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
-    .then(user => {
+    .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
         'some-secret-key',
@@ -83,7 +83,7 @@ const login = (req, res) => {
         })
         .send({ token });
     })
-    .catch(err => res.status(401).send({ message: err.message || errorMessage }))
+    .catch((err) => res.status(401).send({ message: err.message || errorMessage }));
 };
 
 module.exports = {
@@ -93,4 +93,4 @@ module.exports = {
   refreshProfile,
   refreshAvatar,
   login
-}
+};
