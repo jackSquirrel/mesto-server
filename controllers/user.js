@@ -2,43 +2,64 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-const errorMessage = 'Что-то пошло не так';
-
 // Получить список всех пользователей
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => res.status(500).send({ message: err.message || errorMessage }));
+    .catch((err) => {
+      next({
+        message: err.name === err.message,
+        status: err.name === 500
+      });
+    });
 };
 
 // Получить отдельного пользователя
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => res.send(user))
-    .catch((err) => res.status(500).send({ message: err.message || errorMessage }));
+    .catch((err) => {
+      next({
+        message: err.name === 'CastError' ? 'Пользователь не существует' : err.message,
+        status: err.name === 'CastError' ? 404 : 500
+      });
+    });
 };
 
 // Создать пользователя
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
 
   bcrypt.hash(password, 10)
     .then((hash) => {
       User.create({ name, about, avatar, email, password: hash })
         .then((user) => res.send(user))
-        .catch((err) => res.status(400).send({ message: err.message || errorMessage }));
+        .catch((err) => {
+          next({
+            message: err.message,
+            status: err.name === 'ValidationError' ? 400 : 500
+          });
+        });
     })
-    .catch((err) => res.status(500).send({ message: err.message || errorMessage }));
+    .catch((err) => {
+      next({
+        message: err.message,
+        status: 500
+      });
+    });
 };
 
 // Обновить информацию профиля
 
-const refreshProfile = (req, res) => {
-  if (req.body.avatar) {
-    res.status(400).send({ message: errorMessage });
+const refreshProfile = (req, res, next) => {
+  if (req.body.avatar || req.body.email) {
+    next({
+      message: 'Что-то пошло не так',
+      status: 400
+    });
   }
 
   const info = req.body;
@@ -48,12 +69,17 @@ const refreshProfile = (req, res) => {
     runValidators: true
   })
     .then((user) => res.send(user))
-    .catch((err) => res.status(400).send({ message: err.message || errorMessage }));
+    .catch((err) => {
+      next({
+        message: err.message,
+        status: err.name === 'ValidationError' ? 400 : 500
+      });
+    });
 };
 
 // Обновить аватар
 
-const refreshAvatar = (req, res) => {
+const refreshAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { avatar }, {
@@ -61,15 +87,20 @@ const refreshAvatar = (req, res) => {
     runValidators: true
   })
     .then((user) => res.send(user))
-    .catch((err) => res.status(400).send({ message: err.message || errorMessage }));
+    .catch((err) => {
+      next({
+        message: err.message,
+        status: err.name === 'ValidationError' ? 400 : 500
+      });
+    });
 };
 
 // Авторизироваться
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password, next)
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
@@ -83,7 +114,12 @@ const login = (req, res) => {
         })
         .send({ token });
     })
-    .catch((err) => res.status(401).send({ message: err.message || errorMessage }));
+    .catch((err) => {
+      next({
+        message: err.message,
+        status: 500
+      });
+    });
 };
 
 module.exports = {

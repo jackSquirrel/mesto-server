@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const { createUser } = require('./controllers/user');
 const { login } = require('./controllers/user');
 const { auth } = require('./middlewares/auth');
+const { errorMiddleware } = require('./middlewares/errorMiddleware');
 
 const { PORT, cardsRouter, usersRouter } = require('./config');
 
@@ -13,7 +14,8 @@ const app = express();
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
   useCreateIndex: true,
-  useFindAndModify: false
+  useFindAndModify: false,
+  useUnifiedTopology: true
 });
 
 app.use(bodyParser.json());
@@ -27,8 +29,12 @@ app.use(auth);
 
 app.use('/cards', cardsRouter);
 app.use('/users', usersRouter);
-app.use('/*', (req, res) => {
-  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
+app.use('/*', (req, res, next) => {
+  next({
+    message: 'Страница не найдена',
+    status: 404
+  });
 });
+app.use(errorMiddleware);
 
 app.listen(PORT);

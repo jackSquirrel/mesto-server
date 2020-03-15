@@ -41,16 +41,22 @@ const userSchema = new mongoose.Schema({
 { versionKey: false });
 
 // eslint-disable-next-line func-names
-userSchema.statics.findUserByCredentials = function (email, password) {
+userSchema.statics.findUserByCredentials = function (email, password, next) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error('Неправильная почта или пароль'));
+        next({
+          message: 'Неправильная почта или пароль',
+          status: 401
+        });
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new Error('Неправильная почта или пароль'));
+            next({
+              message: 'Неправильная почта или пароль',
+              status: 401
+            });
           }
           return user;
         });

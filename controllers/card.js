@@ -1,56 +1,87 @@
 const Card = require('../models/card');
 
-const errorMessage = 'Что-то пошло не так';
-
 // Получить список всех карточек
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(500).send({ message: err.message || errorMessage }));
+    .catch((err) => {
+      next({
+        message: err.message,
+        status: 500
+      });
+    });
 };
 
 // Создание карточки
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link, createdAt } = req.body;
   const owner = req.user;
 
   Card.create({ name, link, owner, createdAt })
     .then((card) => res.send(card))
-    .catch((err) => res.status(400).send({ message: err.message || errorMessage }));
+    .catch((err) => {
+      next({
+        message: err.message,
+        status: err.name === 'ValidationError' ? 400 : 500
+      });
+    });
 };
 
 // Удаление карточки
 
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     // eslint-disable-next-line consistent-return
     .then((card) => {
       if (card.owner.toString() !== req.user._id) {
-        return Promise.reject(new Error('Недостаточно прав, чтобы удалить карточку'));
+        next({
+          message: 'Недостаточно прав, чтобы удалить карточку',
+          status: 403
+        });
       }
       Card.findByIdAndRemove(req.params.cardId)
         .then(() => res.send(card))
-        .catch((err) => res.status(500).send({ message: err.message || errorMessage }));
+        .catch((err) => {
+          next({
+            message: err.message,
+            status: 500
+          });
+        });
     })
-    .catch((err) => res.status(401).send({ message: err.message || errorMessage }));
+    .catch((err) => {
+      next({
+        message: err.name === 'CastError' ? 'Карточка не существует' : err.message,
+        status: err.name === 'CastError' ? 404 : 500
+      });
+    });
 };
 
 // Поставить лайк
 
-const setLike = (req, res) => {
+const setLike = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .then((card) => res.send(card))
-    .catch((err) => res.status(500).send({ message: err.message || errorMessage }));
+    .catch((err) => {
+      next({
+        message: err.name === 'CastError' ? 'Карточка не существует' : err.message,
+        status: err.name === 'CastError' ? 404 : 500
+      });
+    });
 };
 
 // Убрать лайк
 
-const removeLike = (req, res) => {
+const removeLike = (req, res, next) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then((card) => res.send(card))
-    .catch((err) => res.status(500).send({ message: err.message || errorMessage }));
+    .catch((err) => {
+      next({
+        message: err.name === 'CastError' ? 'Карточка не существует' : err.message,
+        status: err.name === 'CastError' ? 404 : 500
+      });
+    });
 };
 
 module.exports = {
