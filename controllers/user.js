@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const key = require('../keys/token_key');
+const { key } = require('../keys/token_key');
 
 // Получить список всех пользователей
 

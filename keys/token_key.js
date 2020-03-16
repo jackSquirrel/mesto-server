@@ -1,1 +1,1 @@
-module.exports.secretKey = 'some-secret-key';
+module.exports.key = 'some-secret-key';
