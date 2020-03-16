@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const key = require('../keys/token_key');
 
 // Получить список всех пользователей
 
@@ -19,7 +20,16 @@ const getUsers = (req, res, next) => {
 
 const getUser = (req, res, next) => {
   User.findById(req.params.userId)
-    .then((user) => res.send(user))
+    .then((user) => {
+      if (!user) {
+        next({
+          message: 'Пользователь не найден',
+          status: 404
+        });
+        return;
+      }
+      res.send(user);
+    })
     .catch((err) => {
       next({
         message: err.name === 'CastError' ? 'Пользователь не существует' : err.message,
@@ -57,7 +67,7 @@ const createUser = (req, res, next) => {
 const refreshProfile = (req, res, next) => {
   if (req.body.avatar || req.body.email) {
     next({
-      message: 'Что-то пошло не так',
+      message: 'Попытка изменить недоступное поле',
       status: 400
     });
   }
@@ -104,7 +114,7 @@ const login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        'some-secret-key',
+        key,
         { expiresIn: '7d' }
       );
       res

@@ -32,7 +32,8 @@ const createCard = (req, res, next) => {
 // Удаление карточки
 
 const deleteCard = (req, res, next) => {
-  Card.findById(req.params.cardId)
+  const { cardId } = req.params;
+  Card.findById(cardId)
     // eslint-disable-next-line consistent-return
     .then((card) => {
       if (card.owner.toString() !== req.user._id) {
@@ -40,8 +41,9 @@ const deleteCard = (req, res, next) => {
           message: 'Недостаточно прав, чтобы удалить карточку',
           status: 403
         });
+        return;
       }
-      Card.findByIdAndRemove(req.params.cardId)
+      Card.findByIdAndRemove(cardId)
         .then(() => res.send(card))
         .catch((err) => {
           next({
