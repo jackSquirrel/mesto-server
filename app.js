@@ -35,6 +35,7 @@ app.use('/*', (req, res, next) => {
     status: 404
   });
 });
+
 app.use(errorMiddleware);
 
 app.listen(PORT);
