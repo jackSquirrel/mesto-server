@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const { celebrate, Joi } = require('celebrate');
 const { createUser } = require('./controllers/user');
 const { login } = require('./controllers/user');
 const { auth } = require('./middlewares/auth');
@@ -22,8 +23,23 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.post('/signup', createUser);
-app.post('/signin', login);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
+    // eslint-disable-next-line no-useless-escape
+    avatar: Joi.string().required().regex(/https?:\/\/(www\.)?(?:[-\w.]+\.[a-z]+)(?:\/[-\w@\/]*#?)?(?:.(?:jpg|jpeg|png))?/),
+    email: Joi.string().required().unique().regex(/[-.\w]+@[-\w]+\.[a-z]+/),
+    password: Joi.string().required()
+  })
+}), createUser);
+
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().regex(/[-.\w]+@[-\w]+\.[a-z]+/),
+    password: Joi.string().required()
+  })
+}), login);
 
 app.use(auth);
 
