@@ -1,4 +1,10 @@
 # Сервер для проекта MESTO на express.js
+## Адрес
+84.201.156.204
+
+https://api.mestophotoapp.gq/
+
+https://mestophotoapp.gq/
 ## Версия проекта
 v0.2.1 
 ## Технологии, использованные в проекте
