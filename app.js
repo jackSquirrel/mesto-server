@@ -19,7 +19,13 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useCreateIndex: true,
   useFindAndModify: false,
   useUnifiedTopology: true
-});
+})
+  .then(() => {
+    console.log('Connected to MongoDb');
+  })
+  .catch((err) => {
+    console.log(`Connection failed with issue: ${err}`);
+  });
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
