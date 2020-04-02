@@ -18,6 +18,9 @@ const getUsers = (req, res, next) => {
 const getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
+      if (!user) {
+        throw new NotFoundErr('Пользователь не найден');
+      }
       res.send(user);
     })
     .catch((err) => {
