@@ -39,7 +39,8 @@ app.post('/signup', celebrate({
     // eslint-disable-next-line no-useless-escape
     avatar: Joi.string().required().regex(/https?:\/\/(www\.)?(?:[-\w.]+\.[a-z]+)(?:\/[-\w@\/]*#?)?(?:.(?:jpg|jpeg|png))?/),
     email: Joi.string().required().regex(/[-.\w]+@[-\w]+\.[a-z]+/),
-    password: Joi.string().required()
+    // eslint-disable-next-line newline-per-chained-call
+    password: Joi.string().required().alphanum().min(6).max(15)
   })
 }), createUser);
 app.post('/signin', celebrate({
