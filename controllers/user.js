@@ -4,6 +4,7 @@ const User = require('../models/user');
 const { key } = require('../keys/token_key');
 const NotFoundErr = require('../errors/not-found-err');
 const ValidationError = require('../errors/validation-error');
+const { userNotFound, castErr, validationError, notAllowToChange } = require('../errors/error-messages');
 
 // Получить список всех пользователей
 
@@ -19,13 +20,14 @@ const getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        throw new NotFoundErr('Пользователь не найден');
+        throw new NotFoundErr(userNotFound);
       }
       res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new NotFoundErr('Пользователь не найден'));
+        next(new ValidationError(castErr));
+        return;
       }
       next(err);
     });
@@ -44,7 +46,8 @@ const createUser = (req, res, next) => {
         })
         .catch((err) => {
           if (err.name === 'ValidationError') {
-            next(new ValidationError('Ошибка валидации'));
+            next(new ValidationError(validationError));
+            return;
           }
           next(err);
         });
@@ -56,7 +59,7 @@ const createUser = (req, res, next) => {
 
 const refreshProfile = (req, res, next) => {
   if (req.body.avatar || req.body.email) {
-    next(new ValidationError('Попытка изменить недоступное поле'));
+    next(new ValidationError(notAllowToChange));
   }
 
   const info = req.body;
@@ -65,10 +68,16 @@ const refreshProfile = (req, res, next) => {
     new: true,
     runValidators: true
   })
-    .then((user) => res.send(user))
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundErr(userNotFound);
+      }
+      res.send(user);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError(err.message));
+        return;
       }
       next(err);
     });
@@ -83,10 +92,16 @@ const refreshAvatar = (req, res, next) => {
     new: true,
     runValidators: true
   })
-    .then((user) => res.send(user))
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundErr(userNotFound);
+      }
+      res.send(user);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError(err.message));
+        return;
       }
       next(err);
     });
