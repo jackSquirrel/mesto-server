@@ -2,18 +2,16 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { key } = require('../keys/token_key');
+const NotFoundErr = require('../errors/not-found-err');
+const ValidationError = require('../errors/validation-error');
+const { userNotFound, castErr, validationError, notAllowToChange } = require('../errors/error-messages');
 
 // Получить список всех пользователей
 
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => {
-      next({
-        message: err.name === err.message,
-        status: err.name === 500
-      });
-    });
+    .catch(next);
 };
 
 // Получить отдельного пользователя
@@ -22,19 +20,16 @@ const getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        next({
-          message: 'Пользователь не найден',
-          status: 404
-        });
-        return;
+        throw new NotFoundErr(userNotFound);
       }
       res.send(user);
     })
     .catch((err) => {
-      next({
-        message: err.name === 'CastError' ? 'Пользователь не существует' : err.message,
-        status: err.name === 'CastError' ? 404 : 500
-      });
+      if (err.name === 'CastError') {
+        next(new ValidationError(castErr));
+        return;
+      }
+      next(err);
     });
 };
 
@@ -46,30 +41,25 @@ const createUser = (req, res, next) => {
   bcrypt.hash(password, 10)
     .then((hash) => {
       User.create({ name, about, avatar, email, password: hash })
-        .then((user) => res.send(user))
+        .then(() => {
+          res.send({ name, about, avatar, email });
+        })
         .catch((err) => {
-          next({
-            message: err.message,
-            status: err.name === 'ValidationError' ? 400 : 500
-          });
+          if (err.name === 'ValidationError') {
+            next(new ValidationError(validationError));
+            return;
+          }
+          next(err);
         });
     })
-    .catch((err) => {
-      next({
-        message: err.message,
-        status: 500
-      });
-    });
+    .catch(next);
 };
 
 // Обновить информацию профиля
 
 const refreshProfile = (req, res, next) => {
   if (req.body.avatar || req.body.email) {
-    next({
-      message: 'Попытка изменить недоступное поле',
-      status: 400
-    });
+    next(new ValidationError(notAllowToChange));
   }
 
   const info = req.body;
@@ -78,12 +68,18 @@ const refreshProfile = (req, res, next) => {
     new: true,
     runValidators: true
   })
-    .then((user) => res.send(user))
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundErr(userNotFound);
+      }
+      res.send(user);
+    })
     .catch((err) => {
-      next({
-        message: err.message,
-        status: err.name === 'ValidationError' ? 400 : 500
-      });
+      if (err.name === 'ValidationError') {
+        next(new ValidationError(err.message));
+        return;
+      }
+      next(err);
     });
 };
 
@@ -96,12 +92,18 @@ const refreshAvatar = (req, res, next) => {
     new: true,
     runValidators: true
   })
-    .then((user) => res.send(user))
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundErr(userNotFound);
+      }
+      res.send(user);
+    })
     .catch((err) => {
-      next({
-        message: err.message,
-        status: err.name === 'ValidationError' ? 400 : 500
-      });
+      if (err.name === 'ValidationError') {
+        next(new ValidationError(err.message));
+        return;
+      }
+      next(err);
     });
 };
 
@@ -124,12 +126,7 @@ const login = (req, res, next) => {
         })
         .send({ token });
     })
-    .catch((err) => {
-      next({
-        message: err.message,
-        status: 500
-      });
-    });
+    .catch(next);
 };
 
 module.exports = {
